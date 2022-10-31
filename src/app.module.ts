@@ -6,10 +6,11 @@ import { UserService } from './user/user.service';
 import { UserModule } from './user/user.module';
 import { NoteController } from './note/note.controller';
 import { NoteModule } from './note/note.module';
+import { PrismaService } from './prisma.service';
 
 @Module({
   imports: [UserModule, NoteModule],
   controllers: [AppController, UserController, NoteController],
-  providers: [AppService, UserService],
+  providers: [AppService, UserService, PrismaService],
 })
 export class AppModule {}
