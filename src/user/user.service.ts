@@ -31,11 +31,9 @@ export class UserService {
   }
 
   // Get user
-  async user(
-    userWhereUniqueInput: Prisma.UserWhereUniqueInput,
-  ): Promise<User | null> {
-    return this.prisma.user.findUnique({
-      where: userWhereUniqueInput,
+  async getUser(userData: { email: string }): Promise<User | null> {
+    return this.prisma.user.findFirst({
+      where: { email: userData.email },
     });
   }
 
