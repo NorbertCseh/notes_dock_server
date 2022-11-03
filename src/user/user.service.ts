@@ -1,4 +1,42 @@
-import { Injectable } from '@nestjs/common';
+import { ForbiddenException, Injectable } from '@nestjs/common';
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
+import * as argon from 'argon2';
+import { PrismaService } from 'src/prisma/prisma.service';
+import { EditUserDto } from './dto';
 
 @Injectable()
-export class UserService {}
+export class UserService {
+  constructor(private prisma: PrismaService) {}
+  async editUser(userId: string, dto: EditUserDto) {
+    const user = await this.prisma.user.findUnique({ where: { id: userId } });
+
+    if (!user) {
+      throw new ForbiddenException('User does not exists');
+    }
+    if (user.id !== userId) {
+      throw new ForbiddenException('You cannot edit this user');
+    }
+    if (dto.password !== dto.passwordConfirmation) {
+      throw new ForbiddenException('Passowrds are not matching');
+    }
+    let updatedPassword: string;
+    if (dto.password) {
+      updatedPassword = await argon.hash(dto.password);
+    }
+
+    try {
+      return await this.prisma.user.update({
+        where: { id: userId },
+        data: { email: dto.email, password: updatedPassword },
+      });
+    } catch (error) {
+      if (error)
+        if (error instanceof PrismaClientKnownRequestError) {
+          if (error.code === 'P2002') {
+            throw new ForbiddenException('Email was already taken');
+          }
+        }
+      throw error;
+    }
+  }
+}
