@@ -1,27 +1,50 @@
-import { Injectable } from '@nestjs/common';
-import { User } from '@prisma/client';
+import { ForbiddenException, Injectable } from '@nestjs/common';
+import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateNoteDto, EditNoteDto } from './dto';
 
 @Injectable()
 export class NoteService {
+  constructor(private prisma: PrismaService) {}
   //Get all notes
-  getAllNotes(user: User) {
-    return 'all notes';
+  async getAllNotes(userId: string) {
+    return await this.prisma.note.findMany({
+      where: {
+        userId: userId,
+      },
+    });
   }
   //Get Single note by id
-  getNoteById(user: User, noteId: string) {
-    return 'one note';
+  async getNoteById(userId: string, noteId: string) {
+    const note = await this.prisma.note.findUnique({ where: { id: noteId } });
+    if (!note || note.userId !== userId) {
+      throw new ForbiddenException('Access to rescource denied');
+    }
+    return note;
   }
   //Create note
-  createNote(user: User, dto: CreateNoteDto) {
-    return 'this is a new note';
+  async createNote(userId: string, dto: CreateNoteDto) {
+    const note = await this.prisma.note.create({
+      data: { userId, ...dto },
+    });
+    return note;
   }
   //Edit note by id
-  editNoteById(user: User, noteId: string, dto: EditNoteDto) {
-    return 'note edited';
+  async editNoteById(userId: string, noteId: string, dto: EditNoteDto) {
+    const note = await this.prisma.note.findUnique({ where: { id: noteId } });
+    if (!note || note.userId !== userId) {
+      throw new ForbiddenException('Access to rescource denied');
+    }
+    return await this.prisma.note.update({
+      where: { id: noteId },
+      data: { ...dto },
+    });
   }
   //Delete note by id
-  deleteNoteById(user: User, noteId: string) {
-    return 'note deleted';
+  async deleteNoteById(userId: string, noteId: string) {
+    const note = await this.prisma.note.findUnique({ where: { id: noteId } });
+    if (!note || note.userId !== userId) {
+      throw new ForbiddenException('Access to rescource denied');
+    }
+    await this.prisma.note.delete({ where: { id: noteId } });
   }
 }

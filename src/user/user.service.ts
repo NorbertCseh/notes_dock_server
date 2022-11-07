@@ -17,6 +17,8 @@ export class UserService {
       throw new ForbiddenException('You cannot edit this user');
     }
     if (dto.password !== dto.passwordConfirmation) {
+      console.log(dto.password);
+      console.log(dto.passwordConfirmation);
       throw new ForbiddenException('Passowrds are not matching');
     }
     let updatedPassword: string;

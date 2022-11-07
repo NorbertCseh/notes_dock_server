@@ -1,13 +1,16 @@
-import { IsEmail, IsOptional, IsString } from 'class-validator';
+import { IsEmail, IsString, NotEquals, ValidateIf } from 'class-validator';
 
 export class EditUserDto {
   @IsEmail()
-  @IsOptional()
+  @NotEquals(null)
+  @ValidateIf((_, value) => value !== undefined)
   email?: string;
   @IsString()
-  @IsOptional()
+  @NotEquals(null)
+  @ValidateIf((_, value) => value !== undefined)
   password?: string;
   @IsString()
-  @IsOptional()
+  @NotEquals(null)
+  @ValidateIf((_, value) => value !== undefined)
   passwordConfirmation?: string;
 }
