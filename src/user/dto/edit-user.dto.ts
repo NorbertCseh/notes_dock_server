@@ -6,7 +6,7 @@ import {
   NotEquals,
   ValidateIf,
 } from 'class-validator';
-import { Match } from 'src/auth/decorator';
+import { Match } from '../../auth/decorator';
 
 export class EditUserDto {
   @IsEmail()
