@@ -1,4 +1,5 @@
 import { ForbiddenException, Injectable } from '@nestjs/common';
+import { User } from '@prisma/client';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
 import * as argon from 'argon2';
 import { PrismaService } from 'src/prisma/prisma.service';
@@ -17,8 +18,6 @@ export class UserService {
       throw new ForbiddenException('You cannot edit this user');
     }
     if (dto.password !== dto.passwordConfirmation) {
-      console.log(dto.password);
-      console.log(dto.passwordConfirmation);
       throw new ForbiddenException('Passowrds are not matching');
     }
     let updatedPassword: string;
@@ -26,8 +25,9 @@ export class UserService {
       updatedPassword = await argon.hash(dto.password);
     }
 
+    let updatedUser: User;
     try {
-      return await this.prisma.user.update({
+      updatedUser = await this.prisma.user.update({
         where: { id: userId },
         data: { email: dto.email, password: updatedPassword },
       });
@@ -40,5 +40,7 @@ export class UserService {
         }
       throw error;
     }
+    delete updatedUser.password;
+    return updatedUser;
   }
 }
