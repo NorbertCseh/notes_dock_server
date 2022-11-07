@@ -5,8 +5,9 @@ import {
   MaxLength,
   MinLength,
 } from 'class-validator';
+import { Match } from '../decorator';
 
-export class AuthDto {
+export class SignUpDto {
   @IsEmail()
   @IsNotEmpty()
   email: string;
@@ -15,4 +16,10 @@ export class AuthDto {
   @MinLength(6)
   @MaxLength(20)
   password: string;
+  @IsString()
+  @IsNotEmpty()
+  @Match('password', { message: 'Passowrds are not equal' })
+  @MinLength(6)
+  @MaxLength(20)
+  passwordConfirmation: string;
 }

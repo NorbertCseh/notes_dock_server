@@ -6,6 +6,7 @@ import {
   NotEquals,
   ValidateIf,
 } from 'class-validator';
+import { Match } from 'src/auth/decorator';
 
 export class EditUserDto {
   @IsEmail()
@@ -23,5 +24,6 @@ export class EditUserDto {
   @ValidateIf((_, value) => value !== undefined)
   @MinLength(4)
   @MaxLength(20)
+  @Match('password', { message: 'Passowrds are not equal' })
   passwordConfirmation?: string;
 }

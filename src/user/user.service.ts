@@ -11,14 +11,8 @@ export class UserService {
   async editUser(userId: string, dto: EditUserDto) {
     const user = await this.prisma.user.findUnique({ where: { id: userId } });
 
-    if (!user) {
-      throw new ForbiddenException('User does not exists');
-    }
-    if (user.id !== userId) {
-      throw new ForbiddenException('You cannot edit this user');
-    }
-    if (dto.password !== dto.passwordConfirmation) {
-      throw new ForbiddenException('Passowrds are not matching');
+    if (!user || user.id !== userId) {
+      throw new ForbiddenException('Access to resouce denied');
     }
     let updatedPassword: string;
     if (dto.password) {
